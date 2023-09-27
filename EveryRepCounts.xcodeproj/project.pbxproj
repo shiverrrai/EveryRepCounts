@@ -52,7 +52,7 @@
 			isa = PBXGroup;
 			children = (
 				C80A39372AAF66800049CFFC /* EveryRepCountsApp.swift */,
-				C80A39392AAF66800049CFFC /* ContentView.swift */,
+				C8DC01762AB9FCF1008F18D2 /* Views */,
 				C80A393B2AAF66800049CFFC /* Assets.xcassets */,
 				C80A393D2AAF66800049CFFC /* Preview Content */,
 			);
@@ -65,6 +65,14 @@
 				C80A393E2AAF66800049CFFC /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		C8DC01762AB9FCF1008F18D2 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				C80A39392AAF66800049CFFC /* ContentView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
