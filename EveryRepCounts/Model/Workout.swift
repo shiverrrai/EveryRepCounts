@@ -11,14 +11,14 @@ struct Workout: Hashable, Codable, Identifiable {
     var id: Int
     var name: String
     
-    var exercises: Exercise
+    var exercises: [Exercise]
     struct Exercise: Hashable, Codable, Identifiable {
         var id: Int
         var name: String
         var category: String
         var description: String
         
-        var sets: SetData
+        var sets: [SetData]
         struct SetData: Hashable, Codable, Identifiable {
             var id: Int
             var number: Int

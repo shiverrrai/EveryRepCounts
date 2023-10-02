@@ -7,25 +7,6 @@
 
 import SwiftUI
 
-struct SetRow: Identifiable, Equatable {
-    var id: Int
-    var exerciseName: String
-    var numReps: Int
-    var weight: Double
-    init() {
-        self.id = 0
-        self.exerciseName = ""
-        self.numReps = 0
-        self.weight = 0.0
-    }
-    init(id: Int, exerciseName: String, numReps: Int, weight: Double) {
-        self.id = id
-        self.exerciseName = exerciseName
-        self.numReps = numReps
-        self.weight = weight
-    }
-}
-
 
 struct ContentView: View {
     @State private var username: String = ""
