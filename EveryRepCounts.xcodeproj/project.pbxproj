@@ -14,6 +14,7 @@
 		C80A393A2AAF66800049CFFC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C80A39392AAF66800049CFFC /* ContentView.swift */; };
 		C80A393C2AAF66800049CFFC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C80A393B2AAF66800049CFFC /* Assets.xcassets */; };
 		C80A393F2AAF66800049CFFC /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C80A393E2AAF66800049CFFC /* Preview Assets.xcassets */; };
+		C8375BCF2AE6BD3C0038CDD6 /* WorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8375BCE2AE6BD3C0038CDD6 /* WorkoutView.swift */; };
 		C8A2C5632ACB10F300901D81 /* SetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A2C5622ACB10F300901D81 /* SetView.swift */; };
 		C8F327932ACBA73E00161956 /* ExerciseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8F327922ACBA73E00161956 /* ExerciseView.swift */; };
 /* End PBXBuildFile section */
@@ -27,6 +28,7 @@
 		C80A39392AAF66800049CFFC /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C80A393B2AAF66800049CFFC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C80A393E2AAF66800049CFFC /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C8375BCE2AE6BD3C0038CDD6 /* WorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutView.swift; sourceTree = "<group>"; };
 		C8A2C5622ACB10F300901D81 /* SetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetView.swift; sourceTree = "<group>"; };
 		C8F327922ACBA73E00161956 /* ExerciseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -102,6 +104,7 @@
 				C80A39392AAF66800049CFFC /* ContentView.swift */,
 				C8A2C5622ACB10F300901D81 /* SetView.swift */,
 				C8F327922ACBA73E00161956 /* ExerciseView.swift */,
+				C8375BCE2AE6BD3C0038CDD6 /* WorkoutView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -177,6 +180,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C8375BCF2AE6BD3C0038CDD6 /* WorkoutView.swift in Sources */,
 				C8F327932ACBA73E00161956 /* ExerciseView.swift in Sources */,
 				C80A393A2AAF66800049CFFC /* ContentView.swift in Sources */,
 				C8A2C5632ACB10F300901D81 /* SetView.swift in Sources */,
