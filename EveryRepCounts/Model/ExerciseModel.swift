@@ -10,14 +10,12 @@ import SwiftData
 
 @Model
 class ExerciseModel {
-    @Attribute(.unique) var id: Int
     var name: String
     var category: String
     var notes: String
     @Relationship(deleteRule: .cascade) var sets = [SetModel]()
     
-    init(id: Int, name: String = "", category: String = "", notes: String = "") {
-        self.id = id
+    init(name: String = "", category: String = "", notes: String = "") {
         self.name = name
         self.category = category
         self.notes = notes

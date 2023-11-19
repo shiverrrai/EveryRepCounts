@@ -6,57 +6,45 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct ContentView: View {
-    @State private var username: String = ""
-    @State private var inputSet = SetRow()
-    @State private var numberFormatter: NumberFormatter = {
-        var nf = NumberFormatter()
-        nf.numberStyle = .decimal
-        return nf
-    }()
-    
-    let sets = [
-        SetRow(id: 0, exerciseName: "Bench Press", numReps: 12, weight: 115),
-        SetRow(id: 1, exerciseName: "Bench Press", numReps: 12, weight: 115),
-        SetRow(id: 2, exerciseName: "Lat Pulldown", numReps: 10, weight: 130)
-    ]
+    @Environment(\.modelContext) var modelContext
+    @Query var workouts: [WorkoutModel]
+    @State private var path = [WorkoutModel]()
     
     var body: some View {
-        List {
-            Grid {
-                GridRow {
-                    Text("Set")
-                    Text("Exercise")
-                    Text("Reps")
-                    Text("Weight")
-                }
-                .bold()
-                Divider()
-                ForEach(sets) { setItem in
-                    GridRow {
-                        Text(setItem.id+1, format: .number)
-                        Text(setItem.exerciseName)
-                        Text(setItem.numReps, format: .number)
-                        Text(setItem.weight, format: .number)
+        NavigationStack(path: $path) {
+            List {
+                ForEach(workouts) { workout in
+                    NavigationLink(value: workout) {
+                        VStack(alignment: .leading) {
+                            Text(workout.name)
+                                .font(.headline)
+                        }
                     }
-                    if setItem != sets.last {
-                        Divider()
-                    }
-                }
-                Divider()
-                
-                GridRow {
-                    TextField("Set", value: $inputSet.id, formatter: numberFormatter)
-                    TextField("Exercise", text: $inputSet.exerciseName)
-                    TextField("Reps", value: $inputSet.numReps, formatter: numberFormatter)
-                    TextField("Weight", value: $inputSet.weight, formatter: numberFormatter)
-                }
+                }.onDelete(perform: deleteWorkouts)
             }
-//            .padding()
+            .navigationTitle("Every Rep Counts")
+            .navigationDestination(for: WorkoutModel.self, destination: AddWorkoutView.init)
+            .toolbar {
+                Button("Add Workout", action: addWorkout)
+            }
         }
-//        print(String(inputSet.id))
+    }
+    
+    func addWorkout() {
+        let workout = WorkoutModel()
+        modelContext.insert(workout)
+        path = [workout]
+    }
+    
+    
+    func deleteWorkouts(_ indexSet: IndexSet) {
+        for index in indexSet {
+            let workout = workouts[index]
+            modelContext.delete(workout)
+        }
     }
 }
 
