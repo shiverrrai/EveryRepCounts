@@ -9,11 +9,26 @@ import SwiftUI
 import SwiftData
 
 struct AddExerciseView: View {
+    @Bindable var workout: WorkoutModel
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        Button("Add Exercise", action: addExercise)
+    }
+    
+    func addExercise() {
+        let exercise = ExerciseModel()
+        workout.exercises.append(exercise)
     }
 }
 
 #Preview {
-    AddExerciseView()
+    do {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
+        var example = WorkoutModel(name: "Example Workout")
+        return AddExerciseView(workout: example)
+            .modelContainer(container)
+    } catch {
+        fatalError("Failed to create model container.")
+    }
 }

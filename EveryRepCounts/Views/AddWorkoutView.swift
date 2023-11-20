@@ -11,20 +11,31 @@ import SwiftData
 struct AddWorkoutView: View {
     @Bindable var workout: WorkoutModel
     
+    
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         Form {
             ForEach($workout.exercises) { exercise in
-                Text("Choose an exercise:")
+                Table(exercise.sets) {
+                    TableColumn("Set Number") { data in
+                        Text("\(data.number.wrappedValue)")
+                    }
+                    TableColumn("Weight (lbs)") { data in
+                        Text("\(data.weight.wrappedValue)")
+                    }
+                    TableColumn("Reps") { data in
+                        Text("\(data.reps.wrappedValue)")
+                    }
+                }
             }
-            Button("Add Exercise", action: addExercise).frame(maxWidth: .infinity, alignment: .center)
+            
+            NavigationLink("Add Exercise") {
+                AddExerciseView(workout: workout)
+            }
         }
     }
     
-    func addExercise() {
-        let exercise = ExerciseModel()
-        workout.exercises.append(exercise)
-    }
+    
 
 }
 
