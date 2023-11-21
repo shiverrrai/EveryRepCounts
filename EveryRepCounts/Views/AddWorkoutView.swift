@@ -15,15 +15,13 @@ struct AddWorkoutView: View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         Form {
             ForEach($workout.exercises) { exercise in
-                // TODO: fix bug for incorrect exercise/set data population
-                // Reference: https://developer.apple.com/documentation/swiftui/table
                 Grid {
                     GridRow {
-                        Text("Set Number")
+                        Text("Set Number").bold()
                         Spacer()
-                        Text("Weight (lbs)")
+                        Text("Weight (lbs)").bold()
                         Spacer()
-                        Text("Reps")
+                        Text("Reps").bold()
                     }
                     ForEach(exercise.sets) { setData in
                         GridRow {
@@ -35,7 +33,7 @@ struct AddWorkoutView: View {
                         }
                     }
                 }
-            }
+            }.padding()
             NavigationLink("Add Exercise") {
                 AddExerciseView(workout: workout)
             }

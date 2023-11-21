@@ -19,8 +19,8 @@ struct AddExerciseView: View {
     func addExercise() {
         let exercise = ExerciseModel()
         let set = SetModel(number: 0, reps: 0, weight: 0.0)
+        exercise.sets.append(set)
         workout.exercises.append(exercise)
-        workout.exercises.last?.sets.append(set)
     }
 }
 
