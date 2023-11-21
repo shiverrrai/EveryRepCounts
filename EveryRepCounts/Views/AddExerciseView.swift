@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 
+// TODO: update to populate exercise data
 struct AddExerciseView: View {
     @Bindable var workout: WorkoutModel
     
@@ -17,7 +18,9 @@ struct AddExerciseView: View {
     
     func addExercise() {
         let exercise = ExerciseModel()
+        let set = SetModel(number: 0, reps: 0, weight: 0.0)
         workout.exercises.append(exercise)
+        workout.exercises.last?.sets.append(set)
     }
 }
 

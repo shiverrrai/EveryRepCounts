@@ -11,24 +11,31 @@ import SwiftData
 struct AddWorkoutView: View {
     @Bindable var workout: WorkoutModel
     
-    
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         Form {
             ForEach($workout.exercises) { exercise in
-                Table(exercise.sets) {
-                    TableColumn("Set Number") { data in
-                        Text("\(data.number.wrappedValue)")
+                // TODO: fix bug for incorrect exercise/set data population
+                // Reference: https://developer.apple.com/documentation/swiftui/table
+                Grid {
+                    GridRow {
+                        Text("Set Number")
+                        Spacer()
+                        Text("Weight (lbs)")
+                        Spacer()
+                        Text("Reps")
                     }
-                    TableColumn("Weight (lbs)") { data in
-                        Text("\(data.weight.wrappedValue)")
-                    }
-                    TableColumn("Reps") { data in
-                        Text("\(data.reps.wrappedValue)")
+                    ForEach(exercise.sets) { setData in
+                        GridRow {
+                            Text("\(setData.number.wrappedValue + 1)")
+                            Spacer()
+                            Text("\(setData.weight.wrappedValue)")
+                            Spacer()
+                            Text("\(setData.reps.wrappedValue)")
+                        }
                     }
                 }
             }
-            
             NavigationLink("Add Exercise") {
                 AddExerciseView(workout: workout)
             }
