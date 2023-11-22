@@ -13,11 +13,13 @@ class ExerciseModel {
     var name: String
     var category: String
     var notes: String
+    var timestamp: Date
     @Relationship(deleteRule: .cascade) var sets = [SetModel]()
     
-    init(name: String = "", category: String = "", notes: String = "") {
+    init(name: String = "", category: String = "", notes: String = "", timestamp: Date) {
         self.name = name
         self.category = category
         self.notes = notes
+        self.timestamp = timestamp
     }
 }

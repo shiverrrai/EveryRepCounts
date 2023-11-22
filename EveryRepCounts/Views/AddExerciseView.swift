@@ -11,13 +11,22 @@ import SwiftData
 // TODO: update to populate exercise data
 struct AddExerciseView: View {
     @Bindable var workout: WorkoutModel
+    @State private var selectedExercise = "Bench Press"
+    let exercisesList = ["Bench Press", "Lat Pulldown", "Lateral Raises", "Squat"]
     
     var body: some View {
+        Form {
+            Picker("Exercise", selection: $selectedExercise) {
+                ForEach(exercisesList, id: \.self) { exercise in
+                    Text(exercise)
+                }
+            }
+        }
         Button("Add Exercise", action: addExercise)
     }
     
     func addExercise() {
-        let exercise = ExerciseModel()
+        let exercise = ExerciseModel(name: $selectedExercise.wrappedValue, timestamp: Date.now)
         let set = SetModel(number: 0, reps: 0, weight: 0.0)
         exercise.sets.append(set)
         workout.exercises.append(exercise)
