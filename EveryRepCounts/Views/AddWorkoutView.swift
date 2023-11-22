@@ -24,6 +24,7 @@ struct AddWorkoutView: View {
                             Spacer()
                             Text("Reps").bold()
                         }
+                        // TODO: allow user to populate set data and add new sets
                         ForEach(exercise.sets) { setData in
                             GridRow {
                                 Text("\(setData.number.wrappedValue + 1)")

@@ -8,25 +8,26 @@
 import SwiftUI
 import SwiftData
 
-// TODO: update to populate exercise data
+// TODO: improve exercise selection view below
 struct AddExerciseView: View {
     @Bindable var workout: WorkoutModel
-    @State private var selectedExercise = "Bench Press"
-    let exercisesList = ["Bench Press", "Lat Pulldown", "Lateral Raises", "Squat"]
+    @State private var searchText = ""
+    let exerciseList = ["Bench Press", "Lat Pulldown", "Lateral Raises", "Squat"]
     
     var body: some View {
-        Form {
-            Picker("Exercise", selection: $selectedExercise) {
-                ForEach(exercisesList, id: \.self) { exercise in
+        List {
+            ForEach(exerciseList, id: \.self) { exercise in
+                HStack {
                     Text(exercise)
+                    Spacer()
+                    Button("Add Exercise", systemImage: "plus.square.fill", action: {addExercise(exerciseName: exercise)}).labelStyle(.iconOnly)
                 }
             }
         }
-        Button("Add Exercise", action: addExercise)
     }
     
-    func addExercise() {
-        let exercise = ExerciseModel(name: $selectedExercise.wrappedValue, timestamp: Date.now)
+    func addExercise(exerciseName: String) {
+        let exercise = ExerciseModel(name: exerciseName, timestamp: Date.now)
         let set = SetModel(number: 0, reps: 0, weight: 0.0)
         exercise.sets.append(set)
         workout.exercises.append(exercise)
