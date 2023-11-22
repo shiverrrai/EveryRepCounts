@@ -52,7 +52,7 @@ struct AddExerciseView: View {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
-        var example = WorkoutModel(name: "Example Workout")
+        let example = WorkoutModel(name: "Example Workout")
         return AddExerciseView(workout: example)
             .modelContainer(container)
     } catch {

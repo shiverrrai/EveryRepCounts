@@ -11,6 +11,12 @@ import SwiftData
 struct AddWorkoutView: View {
     @Bindable var workout: WorkoutModel
     
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }()
+    
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         List {
@@ -24,14 +30,13 @@ struct AddWorkoutView: View {
                             Spacer()
                             Text("Reps").bold()
                         }
-                        // TODO: allow user to populate set data and add new sets
                         ForEach(exercise.sets.sorted(by: {$0.timestamp.wrappedValue < $1.timestamp.wrappedValue})) { setData in
                             GridRow {
                                 Text("\(setData.number.wrappedValue + 1)")
                                 Spacer()
-                                Text("\(setData.weight.wrappedValue)")
+                                TextField("0.0", value: setData.weight, formatter: formatter).keyboardType(.numberPad).fixedSize()
                                 Spacer()
-                                Text("\(setData.reps.wrappedValue)")
+                                TextField("0", value: setData.reps, formatter: formatter).keyboardType(.numberPad).fixedSize()
                             }
                         }
                     }
@@ -44,6 +49,7 @@ struct AddWorkoutView: View {
         }
     }
     
+    // TODO: incorrect aliases form between sets
     func addSet(exercise: Binding<ExerciseModel>) {
         let setNumber = exercise.sets.count
         let set = SetModel(number: setNumber, reps: 0, weight: 0.0, timestamp: Date.now)
@@ -58,7 +64,7 @@ struct AddWorkoutView: View {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
-        var example = WorkoutModel(name: "Example Workout")
+        let example = WorkoutModel(name: "Example Workout")
 //        example.exercises.append(ExerciseModel(id: 1))
         return AddWorkoutView(workout: example)
             .modelContainer(container)
