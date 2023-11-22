@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 
-// TODO: improve exercise selection view below
 struct AddExerciseView: View {
     @Bindable var workout: WorkoutModel
     @State private var searchText = ""
@@ -16,13 +15,20 @@ struct AddExerciseView: View {
     
     var body: some View {
         List {
-            ForEach(exerciseList, id: \.self) { exercise in
-                HStack {
-                    Text(exercise)
-                    Spacer()
-                    Button("Add Exercise", systemImage: "plus.square.fill", action: {addExercise(exerciseName: exercise)}).labelStyle(.iconOnly)
+            HStack {
+                Label("Icon", systemImage: "magnifyingglass").labelStyle(.iconOnly)
+                TextField("Search for an exercise", text: $searchText)
+            }
+            Section(header: Text("Exercises")) {
+                ForEach(searchResults, id: \.self) { exercise in
+                    HStack {
+                        Text(exercise)
+                        Spacer()
+                        Button("Add Exercise", systemImage: "plus.square.fill", action: {addExercise(exerciseName: exercise)}).labelStyle(.iconOnly)
+                    }
                 }
             }
+            
         }
     }
     
@@ -31,6 +37,14 @@ struct AddExerciseView: View {
         let set = SetModel(number: 0, reps: 0, weight: 0.0)
         exercise.sets.append(set)
         workout.exercises.append(exercise)
+    }
+    
+    var searchResults: [String] {
+        if searchText.isEmpty {
+            return exerciseList
+        } else {
+            return exerciseList.filter { $0.contains(searchText) }
+        }
     }
 }
 
