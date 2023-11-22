@@ -18,14 +18,14 @@ struct AddWorkoutView: View {
                 Section(header: Text(exercise.name.wrappedValue)) {
                     Grid {
                         GridRow {
-                            Text("Set Number").bold()
+                            Text("Set").bold()
                             Spacer()
                             Text("Weight (lbs)").bold()
                             Spacer()
                             Text("Reps").bold()
                         }
                         // TODO: allow user to populate set data and add new sets
-                        ForEach(exercise.sets) { setData in
+                        ForEach(exercise.sets.sorted(by: {$0.timestamp.wrappedValue < $1.timestamp.wrappedValue})) { setData in
                             GridRow {
                                 Text("\(setData.number.wrappedValue + 1)")
                                 Spacer()
@@ -35,12 +35,19 @@ struct AddWorkoutView: View {
                             }
                         }
                     }
+                    Button("Add Set", action: {addSet(exercise: exercise)})
                 }
             }
             NavigationLink("Add Exercise") {
                 AddExerciseView(workout: workout)
             }
         }
+    }
+    
+    func addSet(exercise: Binding<ExerciseModel>) {
+        let setNumber = exercise.sets.count
+        let set = SetModel(number: setNumber, reps: 0, weight: 0.0, timestamp: Date.now)
+        exercise.wrappedValue.sets.append(set)
     }
     
     
