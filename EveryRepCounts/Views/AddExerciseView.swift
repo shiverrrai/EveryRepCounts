@@ -35,8 +35,8 @@ struct AddExerciseView: View {
     func addExercise(exerciseName: String) {
         let exerciseId = workout.exercises.count
         let exercise = ExerciseModel(number: exerciseId, name: exerciseName, timestamp: Date.now)
-        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
-        exercise.sets.append(set)
+//        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
+//        exercise.sets.append(set)
         workout.exercises.append(exercise)
     }
     

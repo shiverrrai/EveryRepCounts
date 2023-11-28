@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct AddWorkoutView: View {
+    @Environment(\.modelContext) var modelContext
     @Bindable var workout: WorkoutModel
     
     let formatter: NumberFormatter = {
@@ -52,14 +53,11 @@ struct AddWorkoutView: View {
         }
     }
     
-    // TODO: incorrect aliases form between sets
     func addSet(exercise: ExerciseModel) {
         let setId = exercise.sets.count
         let set = SetModel(number: setId, reps: 0, weight: 0.0, timestamp: Date.now)
         exercise.sets.append(set)
     }
-    
-    
 
 }
 
