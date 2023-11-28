@@ -8,9 +8,8 @@
 import SwiftUI
 import SwiftData
 
-struct AddWorkoutView: View {
-    @Environment(\.modelContext) var modelContext
-    @Bindable var workout: WorkoutModel
+struct AddSets: View {
+    var sets: [SetModel]
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -19,36 +18,37 @@ struct AddWorkoutView: View {
     }()
     
     var body: some View {
-        TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
-        List {
-            let sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
-            ForEach(sortedExercises) { exercise in
-                Section(header: Text(exercise.name)) {
-                    Grid {
-                        GridRow {
-                            Text("Set").bold()
-                            Spacer()
-                            Text("Weight (lbs)").bold()
-                            Spacer()
-                            Text("Reps").bold()
-                        }
-                        let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
-                        ForEach(sortedSets.indices, id: \.self) { index in
-                            let setData = sortedSets[index]
-                            GridRow {
-                                Text("\(setData.number + 1)")
-                                Spacer()
-                                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sortedSets[index].weight = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
-                                Spacer()
-                                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sortedSets[index].reps = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
-                            }
-                        }
-                    }
-                    Button("Add Set", action: {addSet(exercise: exercise)})
-                }
+        ForEach(sets.indices, id: \.self) { index in
+            let setData = sets[index]
+            GridRow {
+                Text("\(setData.number + 1)")
+                Spacer()
+                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sets[index].weight = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
+                Spacer()
+                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sets[index].reps = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
             }
-            NavigationLink("Add Exercise") {
-                AddExerciseView(workout: workout)
+        }
+    }
+}
+
+struct AddExercises: View {
+    var exercises: [ExerciseModel]
+    
+    var body: some View {
+        ForEach(exercises) { exercise in
+            Section(header: Text(exercise.name)) {
+                Grid {
+                    GridRow {
+                        Text("Set").bold()
+                        Spacer()
+                        Text("Weight (lbs)").bold()
+                        Spacer()
+                        Text("Reps").bold()
+                    }
+                    let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
+                    AddSets(sets: sortedSets)
+                }
+                Button("Add Set", action: {addSet(exercise: exercise)})
             }
         }
     }
@@ -57,6 +57,22 @@ struct AddWorkoutView: View {
         let setId = exercise.sets.count
         let set = SetModel(number: setId, reps: 0, weight: 0.0, timestamp: Date.now)
         exercise.sets.append(set)
+    }
+}
+
+struct AddWorkoutView: View {
+    @Environment(\.modelContext) var modelContext
+    @Bindable var workout: WorkoutModel
+    
+    var body: some View {
+        TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
+        List {
+            let sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
+            AddExercises(exercises: sortedExercises)
+            NavigationLink("Add Exercise") {
+                AddExerciseView(workout: workout)
+            }
+        }
     }
 
 }
