@@ -26,7 +26,9 @@ struct ContentView: View {
                 }.onDelete(perform: deleteWorkouts)
             }
             .navigationTitle("Every Rep Counts")
-            .navigationDestination(for: WorkoutModel.self, destination: AddWorkoutView.init)
+            .navigationDestination(for: WorkoutModel.self) { workout in
+                AddWorkoutView(workout: workout)
+            }
             .toolbar {
                 Button("Add Workout", action: addWorkout)
             }

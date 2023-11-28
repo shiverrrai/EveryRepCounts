@@ -20,8 +20,9 @@ struct AddWorkoutView: View {
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         List {
-            ForEach($workout.exercises.sorted(by: {$0.timestamp.wrappedValue < $1.timestamp.wrappedValue})) { exercise in
-                Section(header: Text(exercise.name.wrappedValue)) {
+            let sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
+            ForEach(sortedExercises) { exercise in
+                Section(header: Text(exercise.name)) {
                     Grid {
                         GridRow {
                             Text("Set").bold()
@@ -30,13 +31,15 @@ struct AddWorkoutView: View {
                             Spacer()
                             Text("Reps").bold()
                         }
-                        ForEach(exercise.sets.sorted(by: {$0.timestamp.wrappedValue < $1.timestamp.wrappedValue})) { setData in
+                        let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
+                        ForEach(sortedSets.indices, id: \.self) { index in
+                            let setData = sortedSets[index]
                             GridRow {
-                                Text("\(setData.number.wrappedValue + 1)")
+                                Text("\(setData.number + 1)")
                                 Spacer()
-                                TextField("0.0", value: setData.weight, formatter: formatter).keyboardType(.numberPad).fixedSize()
+                                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sortedSets[index].weight = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
                                 Spacer()
-                                TextField("0", value: setData.reps, formatter: formatter).keyboardType(.numberPad).fixedSize()
+                                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sortedSets[index].reps = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
                             }
                         }
                     }
@@ -50,10 +53,10 @@ struct AddWorkoutView: View {
     }
     
     // TODO: incorrect aliases form between sets
-    func addSet(exercise: Binding<ExerciseModel>) {
-        let setNumber = exercise.sets.count
-        let set = SetModel(number: setNumber, reps: 0, weight: 0.0, timestamp: Date.now)
-        exercise.wrappedValue.sets.append(set)
+    func addSet(exercise: ExerciseModel) {
+        let setId = exercise.sets.count
+        let set = SetModel(number: setId, reps: 0, weight: 0.0, timestamp: Date.now)
+        exercise.sets.append(set)
     }
     
     
@@ -65,7 +68,6 @@ struct AddWorkoutView: View {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
         let example = WorkoutModel(name: "Example Workout")
-//        example.exercises.append(ExerciseModel(id: 1))
         return AddWorkoutView(workout: example)
             .modelContainer(container)
     } catch {
