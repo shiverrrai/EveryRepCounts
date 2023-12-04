@@ -8,7 +8,7 @@
 import SwiftUI
 import SwiftData
 
-struct AddSets: View {
+struct DisplaySets: View {
     var sets: [SetModel]
     
     let formatter: NumberFormatter = {
@@ -31,23 +31,22 @@ struct AddSets: View {
     }
 }
 
-struct AddExercises: View {
-    var exercises: [ExerciseModel]
+struct DisplayExercises: View {
+    @Environment(\.modelContext) var modelContext
+    var exercise: ExerciseModel
     
     var body: some View {
-        ForEach(exercises) { exercise in
-            Section(header: Text(exercise.name)) {
-                Grid {
-                    GridRow {
-                        Text("Set").bold()
-                        Spacer()
-                        Text("Weight (lbs)").bold()
-                        Spacer()
-                        Text("Reps").bold()
-                    }
-                    let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
-                    AddSets(sets: sortedSets)
+        Section(header: Text(exercise.name)) {
+            Grid {
+                GridRow {
+                    Text("Set").bold()
+                    Spacer()
+                    Text("Weight (lbs)").bold()
+                    Spacer()
+                    Text("Reps").bold()
                 }
+                let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
+                DisplaySets(sets: sortedSets)
                 Button("Add Set", action: {addSet(exercise: exercise)})
             }
         }
@@ -58,21 +57,46 @@ struct AddExercises: View {
         let set = SetModel(number: setId, reps: 0, weight: 0.0, timestamp: Date.now)
         exercise.sets.append(set)
     }
+    
+    
 }
 
 struct AddWorkoutView: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var workout: WorkoutModel
+    @State private var sortedExercises: [ExerciseModel] = []
     
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         List {
-            let sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
-            AddExercises(exercises: sortedExercises)
+            ForEach(sortedExercises) { exercise in
+                DisplayExercises(exercise: exercise)
+            }.onDelete { indices in
+                deleteExercises(at: indices)
+            }
             NavigationLink("Add Exercise") {
                 AddExerciseView(workout: workout)
             }
+        }.onAppear {
+            sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
+        }.toolbar {
+            EditButton()
         }
+    }
+    
+    //TODO: fix exercise numbering when deleting an exercise
+    func deleteExercises(at indices: IndexSet) {
+        for i in indices {
+            sortedExercises.remove(at: i)
+            // now remove workout.exercises by number instead of index
+            if let index = workout.exercises.firstIndex(where: {$0.number == i}) {
+                let exercise = workout.exercises[index]
+                workout.exercises.remove(at: index)
+                modelContext.delete(exercise)
+                
+            }
+        }
+        
     }
 
 }
