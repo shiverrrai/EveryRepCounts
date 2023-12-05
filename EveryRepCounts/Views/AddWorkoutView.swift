@@ -36,7 +36,7 @@ struct DisplayExercises: View {
     var exercise: ExerciseModel
     
     var body: some View {
-        Section(header: Text(exercise.name)) {
+        Section(header: Text(exercise.name + " " + String(exercise.number))) {
             Grid {
                 GridRow {
                     Text("Set").bold()
@@ -86,15 +86,19 @@ struct AddWorkoutView: View {
     
     //TODO: fix exercise numbering when deleting an exercise
     func deleteExercises(at indices: IndexSet) {
-        for i in indices {
-            sortedExercises.remove(at: i)
-            // now remove workout.exercises by number instead of index
-            if let index = workout.exercises.firstIndex(where: {$0.number == i}) {
-                let exercise = workout.exercises[index]
-                workout.exercises.remove(at: index)
-                modelContext.delete(exercise)
-                
+        do {
+            for i in indices {
+                let removedExercise = sortedExercises.remove(at: i)
+                // now remove workout.exercises by number instead of index
+                if let index = workout.exercises.firstIndex(where: {$0.number == removedExercise.number}) {
+                    let exercise = workout.exercises[index]
+                    modelContext.delete(exercise)
+                    workout.exercises.remove(at: index)
+                }
             }
+            try modelContext.save()
+        } catch {
+            // Handle exception
         }
         
     }

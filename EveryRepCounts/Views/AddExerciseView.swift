@@ -33,8 +33,10 @@ struct AddExerciseView: View {
     }
     
     func addExercise(exerciseName: String) {
-        let exerciseId = workout.exercises.count
-        let exercise = ExerciseModel(number: exerciseId, name: exerciseName, timestamp: Date.now)
+        let exercise = ExerciseModel(number: 0, name: exerciseName, timestamp: Date.now)
+        if let lastExercise = workout.exercises.max(by: {$0.number < $1.number}) {
+            exercise.number = lastExercise.number+1
+        }
         workout.exercises.append(exercise)
     }
     
