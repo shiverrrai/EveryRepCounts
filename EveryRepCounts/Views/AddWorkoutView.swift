@@ -7,6 +7,27 @@
 
 import SwiftUI
 import SwiftData
+import Combine
+
+public struct SelectAllTextOnBeginEditingModifier: ViewModifier {
+    public func body(content: Content) -> some View {
+        content
+            .onReceive(NotificationCenter.default.publisher(
+                for: UITextField.textDidBeginEditingNotification)) { _ in
+                    DispatchQueue.main.async {
+                        UIApplication.shared.sendAction(
+                            #selector(UIResponder.selectAll(_:)), to: nil, from: nil, for: nil
+                        )
+                    }
+                }
+        }
+}
+
+extension View {
+    public func selectAllTextOnBeginEditing() -> some View {
+        modifier(SelectAllTextOnBeginEditingModifier())
+    }
+}
 
 struct DisplaySets: View {
     var sets: [SetModel]
@@ -17,26 +38,35 @@ struct DisplaySets: View {
         return formatter
     }()
     
+    // TODO: See following docs to implement set deletion:
+    // https://developer.apple.com/documentation/swiftui/view/swipeactions(edge:allowsfullswipe:content:)
     var body: some View {
         ForEach(sets.indices, id: \.self) { index in
             let setData = sets[index]
             GridRow {
                 Text("\(setData.number + 1)")
                 Spacer()
-                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sets[index].weight = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
+                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sets[index].weight = newValue }), formatter: formatter)
+                    .selectAllTextOnBeginEditing()
+                    .keyboardType(.decimalPad)
+                    .fixedSize()
                 Spacer()
-                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sets[index].reps = newValue }), formatter: formatter).keyboardType(.numberPad).fixedSize()
+                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sets[index].reps = newValue }), formatter: formatter)
+                    .selectAllTextOnBeginEditing()
+                    .keyboardType(.numberPad)
+                    .fixedSize()
+                    
             }
         }
     }
 }
 
-struct DisplayExercises: View {
+struct DisplayExercise: View {
     @Environment(\.modelContext) var modelContext
     var exercise: ExerciseModel
     
     var body: some View {
-        Section(header: Text(exercise.name + " " + String(exercise.number))) {
+        Section(header: Text(exercise.name)) {
             Grid {
                 GridRow {
                     Text("Set").bold()
@@ -47,8 +77,9 @@ struct DisplayExercises: View {
                 }
                 let sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
                 DisplaySets(sets: sortedSets)
-                Button("Add Set", action: {addSet(exercise: exercise)})
+                
             }
+            Button("Add Set", action: {addSet(exercise: exercise)}).deleteDisabled(true)
         }
     }
     
@@ -69,8 +100,8 @@ struct AddWorkoutView: View {
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         List {
-            ForEach(sortedExercises) { exercise in
-                DisplayExercises(exercise: exercise)
+            ForEach(sortedExercises.indices, id: \.self) { index in
+                DisplayExercise(exercise: sortedExercises[index])
             }.onDelete { indices in
                 deleteExercises(at: indices)
             }
@@ -79,12 +110,9 @@ struct AddWorkoutView: View {
             }
         }.onAppear {
             sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
-        }.toolbar {
-            EditButton()
         }
     }
     
-    //TODO: fix exercise numbering when deleting an exercise
     func deleteExercises(at indices: IndexSet) {
         do {
             for i in indices {
