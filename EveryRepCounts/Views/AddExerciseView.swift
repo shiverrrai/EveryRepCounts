@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct AddExerciseView: View {
+    @Environment(\.modelContext) var modelContext
     @Bindable var workout: WorkoutModel
     @State private var searchText = ""
     let exerciseList = ["Bench Press", "Lat Pulldown", "Lateral Raises", "Squat"]
@@ -33,13 +34,14 @@ struct AddExerciseView: View {
     }
     
     func addExercise(exerciseName: String) {
-        let exercise = ExerciseModel(number: 0, name: exerciseName, timestamp: Date.now)
+        let exercise = ExerciseModel(workoutNumber: workout.number, number: 0, name: exerciseName, timestamp: Date.now)
         if let lastExercise = workout.exercises.max(by: {$0.number < $1.number}) {
             exercise.number = lastExercise.number+1
         }
-        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
-        exercise.sets.append(set)
+//        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
+//        exercise.sets.append(set)
         workout.exercises.append(exercise)
+        modelContext.insert(exercise)
     }
     
     var searchResults: [String] {
@@ -55,7 +57,7 @@ struct AddExerciseView: View {
     do {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
-        let example = WorkoutModel(name: "Example Workout")
+        let example = WorkoutModel(id: UUID(), number: 0, name: "Example Workout")
         return AddExerciseView(workout: example)
             .modelContainer(container)
     } catch {
