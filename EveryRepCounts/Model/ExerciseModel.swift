@@ -17,6 +17,7 @@ class ExerciseModel {
     var notes: String
     var timestamp: Date
     @Relationship(deleteRule: .cascade) var sets = [SetModel]()
+    var workout: WorkoutModel?
     
     init(workoutNumber: Int, number: Int = 0, name: String = "", category: String = "", notes: String = "", timestamp: Date) {
         self.workoutNumber = workoutNumber

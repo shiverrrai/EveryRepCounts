@@ -13,7 +13,7 @@ class WorkoutModel {
     @Attribute(.unique) var id: UUID
     var number: Int
     var name: String
-    @Relationship(deleteRule: .cascade) var exercises = [ExerciseModel]()
+    @Relationship(deleteRule: .cascade, inverse: \ExerciseModel.workout) var exercises = [ExerciseModel]()
     
     init(id: UUID, number: Int, name: String = "") {
         self.id = id

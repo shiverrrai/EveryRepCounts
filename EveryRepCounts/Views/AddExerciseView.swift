@@ -41,6 +41,7 @@ struct AddExerciseView: View {
 //        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
 //        exercise.sets.append(set)
         workout.exercises.append(exercise)
+        exercise.workout = workout
         modelContext.insert(exercise)
     }
     

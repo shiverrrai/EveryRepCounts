@@ -38,7 +38,6 @@ struct TestView: View {
         do {
             for i in indices {
                 let exercise = exercises[i]
-//                workout.exercises.remove(at: i)
                 modelContext.delete(exercise)
             }
             try modelContext.save()
