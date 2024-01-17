@@ -9,10 +9,6 @@ import SwiftUI
 import SwiftData
 import Combine
 
-// https://www.wwdcnotes.com/notes/wwdc23/10187/
-// https://www.wwdcnotes.com/notes/wwdc23/10154/
-// Need to fully understand SwiftData and Observation
-
 public struct SelectAllTextOnBeginEditingModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
@@ -33,11 +29,11 @@ extension View {
     }
 }
 
-struct DisplaySets: View {
+// TODO: fix set deletion
+struct DisplaySet: View {
     @Environment(\.modelContext) var modelContext
-    @Bindable var workout: WorkoutModel
-    var exerciseNumber: Int
-    @Binding var sets: [SetModel]
+    @Bindable var singleSet: SetModel
+    var number: Int
     
     let formatter: NumberFormatter = {
         let formatter = NumberFormatter()
@@ -46,64 +42,26 @@ struct DisplaySets: View {
     }()
     
     var body: some View {
-        ForEach(sets.indices, id: \.self) { index in
-            let setData = sets[index]
-            GridRow {
-                Text("\(setData.number + 1)")
-                Spacer()
-                TextField("0.0", value: Binding(get: { setData.weight }, set: { newValue in sets[index].weight = newValue }), formatter: formatter)
-                    .selectAllTextOnBeginEditing()
-                    .keyboardType(.decimalPad)
-                    .fixedSize()
-                Spacer()
-                TextField("0", value: Binding(get: { setData.reps }, set: { newValue in sets[index].reps = newValue }), formatter: formatter)
-                    .selectAllTextOnBeginEditing()
-                    .keyboardType(.numberPad)
-                    .fixedSize()
-//                    .swipeActions(edge: .leading) {
-//                        Button(role: .destructive) {
-//                            deleteSet(at: index)
-//                        } label: {
-//                            Label("Delete", systemImage: "trash")
-//                        }
-//                    }
-                Spacer()
-                // perhaps create a separate view for a set row? that way the button will delete that particular set only. you can also try using the swipe actions for this
-                Button {
-                    deleteSet(at: index)
-                } label: {
-                    Label("Delete", systemImage: "trash")
-                }
-            }
+        GridRow {
+            Text("\(singleSet.number + 1)")
+            Spacer()
+            TextField("0.0", value: $singleSet.weight, formatter: formatter)
+                .selectAllTextOnBeginEditing()
+                .keyboardType(.decimalPad)
+                .fixedSize()
+            Spacer()
+            TextField("0", value: $singleSet.reps, formatter: formatter)
+                .selectAllTextOnBeginEditing()
+                .keyboardType(.numberPad)
+                .fixedSize()
         }
-    }
-    
-    func deleteSet(at index: Int) {
-        print(index)
-//        do {
-////            for index in indices {
-//                print(index)
-//                let removedSet = sets.remove(at: index)
-//                if let exerciseIndex = workout.exercises.firstIndex(where: {$0.number == exerciseNumber}) {
-//                    if let setIndex = workout.exercises[exerciseIndex].sets.firstIndex(where: {$0.number == removedSet.number}) {
-//                        let set = workout.exercises[exerciseIndex].sets[setIndex]
-//                        modelContext.delete(set)
-//                        workout.exercises[exerciseIndex].sets.remove(at: setIndex)
-//                    }
-//                }
-////            }
-//            try modelContext.save()
-//        } catch {
-//            // Handle exception
-//        }
-        
     }
 }
 
 struct DisplayExercise: View {
-    @Bindable var workout: WorkoutModel
-    var exercise: ExerciseModel
-    @State private var sortedSets: [SetModel] = []
+    @Environment(\.modelContext) var modelContext
+    @Bindable var exercise: ExerciseModel
+    @Query var sets: [SetModel]
     
     var body: some View {
         Section(header: Text(exercise.name)) {
@@ -115,57 +73,68 @@ struct DisplayExercise: View {
                     Spacer()
                     Text("Reps").bold()
                 }
-                DisplaySets(workout: workout, exerciseNumber: exercise.number, sets: $sortedSets)
+                ForEach(sets.indices, id: \.self) { index in
+                    DisplaySet(singleSet: sets[index], number: sets[index].number)
+                }
             }
             Button("Add Set", action: {addSet(exercise: exercise)}).deleteDisabled(true)
-        }.onAppear {
-            sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
-        }.onChange(of: exercise) {
-            sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
         }
     }
     
-    func addSet(exercise: ExerciseModel) {
-        let setId = exercise.sets.count
-        let set = SetModel(number: setId, reps: 0, weight: 0.0, timestamp: Date.now)
-        exercise.sets.append(set)
-        sortedSets = Array(exercise.sets).sorted(by: {$0.number < $1.number})
+    init(exercise: ExerciseModel, workoutNumber: Int, exerciseNumber: Int) {
+        _exercise = Bindable(exercise)
+        _sets = Query(filter: #Predicate<SetModel> { set in
+            set.workoutNumber == workoutNumber && set.exerciseNumber == exerciseNumber
+        }, sort: [SortDescriptor(\SetModel.number)])
     }
     
+    let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter
+    }()
     
+    func addSet(exercise: ExerciseModel) {
+        let set = SetModel(workoutNumber: exercise.workoutNumber, exerciseNumber: exercise.number, number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
+        if let lastSet = sets.max(by: {$0.number < $1.number}) {
+            set.number = lastSet.number+1
+        }
+        exercise.sets.append(set)
+        modelContext.insert(set)
+    }
 }
 
 struct AddWorkoutView: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var workout: WorkoutModel
-    @State private var sortedExercises: [ExerciseModel] = []
+    @Query private var exercises: [ExerciseModel]
     
     var body: some View {
         TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
         List {
-            ForEach(sortedExercises.indices, id: \.self) { index in
-                DisplayExercise(workout: workout, exercise: sortedExercises[index])
+            ForEach(exercises) { exercise in
+                DisplayExercise(exercise: exercise, workoutNumber: exercise.workoutNumber, exerciseNumber: exercise.number)
             }.onDelete { indices in
                 deleteExercises(at: indices)
             }
             NavigationLink("Add Exercise") {
                 AddExerciseView(workout: workout)
             }
-        }.onAppear {
-            sortedExercises = Array(workout.exercises).sorted(by: {$0.number < $1.number})
         }
+    }
+    
+    init(workout: WorkoutModel, number: Int) {
+        _workout = Bindable(workout)
+        _exercises = Query(filter: #Predicate<ExerciseModel> { exercise in
+            exercise.workoutNumber == number
+        }, sort: [SortDescriptor(\ExerciseModel.number)])
     }
     
     func deleteExercises(at indices: IndexSet) {
         do {
             for i in indices {
-                let removedExercise = sortedExercises.remove(at: i)
-                // now remove workout.exercises by number instead of index
-                if let index = workout.exercises.firstIndex(where: {$0.number == removedExercise.number}) {
-                    let exercise = workout.exercises[index]
-                    modelContext.delete(exercise)
-                    workout.exercises.remove(at: index)
-                }
+                let exercise = exercises[i]
+                modelContext.delete(exercise)
             }
             try modelContext.save()
         } catch {
@@ -181,7 +150,7 @@ struct AddWorkoutView: View {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: WorkoutModel.self, configurations: config)
         let example = WorkoutModel(id: UUID(), number: 0, name: "Example Workout")
-        return AddWorkoutView(workout: example)
+        return AddWorkoutView(workout: example, number: example.number)
             .modelContainer(container)
     } catch {
         fatalError("Failed to create model container.")

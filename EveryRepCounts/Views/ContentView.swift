@@ -28,7 +28,7 @@ struct ContentView: View {
             }
             .navigationTitle("Every Rep Counts")
             .navigationDestination(for: WorkoutModel.self) { workout in
-                TestView(workout: workout, number: workout.number)
+                AddWorkoutView(workout: workout, number: workout.number)
             }
             .toolbar {
                 Button("Add Workout", action: addWorkout)
@@ -38,7 +38,10 @@ struct ContentView: View {
     }
     
     func addWorkout() {
-        let workout = WorkoutModel(id: UUID(), number: workouts.count)
+        let workout = WorkoutModel(id: UUID(), number: 0)
+        if let lastWorkout = workouts.max(by: {$0.number < $1.number}) {
+            workout.number = lastWorkout.number+1
+        }
         modelContext.insert(workout)
         path = [workout]
     }

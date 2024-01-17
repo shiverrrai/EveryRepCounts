@@ -16,7 +16,7 @@ class ExerciseModel {
     var category: String
     var notes: String
     var timestamp: Date
-    @Relationship(deleteRule: .cascade) var sets = [SetModel]()
+    @Relationship(deleteRule: .cascade, inverse: \SetModel.exercise) var sets = [SetModel]()
     var workout: WorkoutModel?
     
     init(workoutNumber: Int, number: Int = 0, name: String = "", category: String = "", notes: String = "", timestamp: Date) {

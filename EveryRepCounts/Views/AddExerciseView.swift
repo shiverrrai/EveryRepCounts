@@ -38,8 +38,6 @@ struct AddExerciseView: View {
         if let lastExercise = workout.exercises.max(by: {$0.number < $1.number}) {
             exercise.number = lastExercise.number+1
         }
-//        let set = SetModel(number: 0, reps: 0, weight: 0.0, timestamp: Date.now)
-//        exercise.sets.append(set)
         workout.exercises.append(exercise)
         exercise.workout = workout
         modelContext.insert(exercise)
