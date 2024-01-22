@@ -42,6 +42,7 @@ struct ContentView: View {
         if let lastWorkout = workouts.max(by: {$0.number < $1.number}) {
             workout.number = lastWorkout.number+1
         }
+        workout.name = "Workout " + String(workout.number)
         modelContext.insert(workout)
         path = [workout]
     }
@@ -69,6 +70,9 @@ struct ContentView: View {
                 // SwiftData bug: https://developer.apple.com/forums/thread/740649
                 // Cascade delete not working
                 for exercise in workout.exercises {
+                    for set in exercise.sets {
+                        modelContext.delete(set)
+                    }
                     modelContext.delete(exercise)
                 }
                 modelContext.delete(workout)

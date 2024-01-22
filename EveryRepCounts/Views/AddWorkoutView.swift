@@ -29,7 +29,6 @@ extension View {
     }
 }
 
-// TODO: fix set deletion
 struct DisplaySet: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var singleSet: SetModel
@@ -42,18 +41,21 @@ struct DisplaySet: View {
     }()
     
     var body: some View {
-        GridRow {
-            Text("\(singleSet.number + 1)")
+        HStack(alignment: .center) {
+            Text("\(number + 1)")
+                .frame(width: 100, height: 30, alignment: .leading)
             Spacer()
             TextField("0.0", value: $singleSet.weight, formatter: formatter)
                 .selectAllTextOnBeginEditing()
                 .keyboardType(.decimalPad)
                 .fixedSize()
+                .frame(width: 100, height: 30, alignment: .center)
             Spacer()
             TextField("0", value: $singleSet.reps, formatter: formatter)
                 .selectAllTextOnBeginEditing()
                 .keyboardType(.numberPad)
                 .fixedSize()
+                .frame(width: 100, height: 30, alignment: .trailing)
         }
     }
 }
@@ -64,21 +66,19 @@ struct DisplayExercise: View {
     @Query var sets: [SetModel]
     
     var body: some View {
-        Section(header: Text(exercise.name)) {
-            Grid {
-                GridRow {
-                    Text("Set").bold()
-                    Spacer()
-                    Text("Weight (lbs)").bold()
-                    Spacer()
-                    Text("Reps").bold()
-                }
-                ForEach(sets.indices, id: \.self) { index in
-                    DisplaySet(singleSet: sets[index], number: sets[index].number)
-                }
-            }
-            Button("Add Set", action: {addSet(exercise: exercise)}).deleteDisabled(true)
+        HStack {
+            Text("Set").bold()
+            Spacer()
+            Text("Weight (lbs)").bold()
+            Spacer()
+            Text("Reps").bold()
         }
+        ForEach(sets.indices, id: \.self) { index in
+            DisplaySet(singleSet: sets[index], number: index)
+        }.onDelete { indices in
+            deleteSets(at: indices)
+        }
+        Button("Add Set", action: {addSet(exercise: exercise)}).deleteDisabled(true)
     }
     
     init(exercise: ExerciseModel, workoutNumber: Int, exerciseNumber: Int) {
@@ -102,6 +102,18 @@ struct DisplayExercise: View {
         exercise.sets.append(set)
         modelContext.insert(set)
     }
+    
+    func deleteSets(at indices: IndexSet) {
+        do {
+            for i in indices {
+                let set = sets[i]
+                modelContext.delete(set)
+            }
+            try modelContext.save()
+        } catch {
+            // Handle exception
+        }
+    }
 }
 
 struct AddWorkoutView: View {
@@ -110,17 +122,28 @@ struct AddWorkoutView: View {
     @Query private var exercises: [ExerciseModel]
     
     var body: some View {
-        TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
-        List {
-            ForEach(exercises) { exercise in
-                DisplayExercise(exercise: exercise, workoutNumber: exercise.workoutNumber, exerciseNumber: exercise.number)
-            }.onDelete { indices in
-                deleteExercises(at: indices)
+        NavigationView {
+            List {
+                ForEach(exercises) { exercise in
+                    Section {
+                        HStack {
+                            Text(exercise.name)
+                                .bold()
+                            Spacer()
+                            Button(action: {deleteExercise(exercise: exercise)}) {
+                                Label("", systemImage: "trash")
+                                    .labelStyle(.iconOnly)
+                            }.buttonStyle(BorderlessButtonStyle())
+                        }
+                        DisplayExercise(exercise: exercise, workoutNumber: exercise.workoutNumber, exerciseNumber: exercise.number)
+                    }
+                }
+                NavigationLink("Add Exercise") {
+                    AddExerciseView(workout: workout)
+                }
             }
-            NavigationLink("Add Exercise") {
-                AddExerciseView(workout: workout)
-            }
-        }
+        }.navigationTitle($workout.name)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     init(workout: WorkoutModel, number: Int) {
@@ -130,17 +153,16 @@ struct AddWorkoutView: View {
         }, sort: [SortDescriptor(\ExerciseModel.number)])
     }
     
-    func deleteExercises(at indices: IndexSet) {
+    func deleteExercise(exercise: ExerciseModel) {
         do {
-            for i in indices {
-                let exercise = exercises[i]
-                modelContext.delete(exercise)
+            for set in exercise.sets {
+                modelContext.delete(set)
             }
+            modelContext.delete(exercise)
             try modelContext.save()
         } catch {
             // Handle exception
         }
-        
     }
 
 }

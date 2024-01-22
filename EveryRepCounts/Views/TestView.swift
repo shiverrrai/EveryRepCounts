@@ -14,17 +14,28 @@ struct TestView: View {
     @Query private var exercises: [ExerciseModel]
     
     var body: some View {
-        TextField("Workout Name", text: $workout.name).font(.title).padding(.horizontal)
-        List {
-            ForEach(exercises) { exercise in
-                Text(exercise.name + " " + String(exercise.number))
-            }.onDelete { indices in
-                deleteExercises(at: indices)
+        NavigationView {
+            List {
+                ForEach(exercises) { exercise in
+                    Section {
+                        HStack {
+                            Text(exercise.name)
+                                .bold()
+                            Spacer()
+                            Button(action: {deleteExercise(exercise: exercise)}) {
+                                Label("", systemImage: "trash")
+                                    .labelStyle(.iconOnly)
+                            }.buttonStyle(BorderlessButtonStyle())
+                        }
+                        DisplayExercise(exercise: exercise, workoutNumber: exercise.workoutNumber, exerciseNumber: exercise.number)
+                    }
+                }
+                NavigationLink("Add Exercise") {
+                    AddExerciseView(workout: workout)
+                }
             }
-            NavigationLink("Add Exercise") {
-                AddExerciseView(workout: workout)
-            }
-        }
+        }.navigationTitle($workout.name)
+        .navigationBarTitleDisplayMode(.inline)
     }
     
     init(workout: WorkoutModel, number: Int) {
@@ -34,17 +45,16 @@ struct TestView: View {
         }, sort: [SortDescriptor(\ExerciseModel.number)])
     }
     
-    func deleteExercises(at indices: IndexSet) {
+    func deleteExercise(exercise: ExerciseModel) {
         do {
-            for i in indices {
-                let exercise = exercises[i]
-                modelContext.delete(exercise)
+            for set in exercise.sets {
+                modelContext.delete(set)
             }
+            modelContext.delete(exercise)
             try modelContext.save()
         } catch {
             // Handle exception
         }
-        
     }
 }
 
