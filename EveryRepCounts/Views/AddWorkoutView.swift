@@ -9,6 +9,14 @@ import SwiftUI
 import SwiftData
 import Combine
 
+#if canImport(UIKit)
+extension View {
+    func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}
+#endif
+
 public struct SelectAllTextOnBeginEditingModifier: ViewModifier {
     public func body(content: Content) -> some View {
         content
@@ -45,13 +53,13 @@ struct DisplaySet: View {
             Text("\(number + 1)")
                 .frame(width: 100, height: 30, alignment: .leading)
             Spacer()
-            TextField("0.0", value: $singleSet.weight, formatter: formatter)
+            TextField("Weight", value: $singleSet.weight, formatter: formatter)
                 .selectAllTextOnBeginEditing()
                 .keyboardType(.decimalPad)
                 .fixedSize()
                 .frame(width: 100, height: 30, alignment: .center)
             Spacer()
-            TextField("0", value: $singleSet.reps, formatter: formatter)
+            TextField("Reps", value: $singleSet.reps, formatter: formatter)
                 .selectAllTextOnBeginEditing()
                 .keyboardType(.numberPad)
                 .fixedSize()
@@ -142,8 +150,16 @@ struct AddWorkoutView: View {
                     AddExerciseView(workout: workout)
                 }
             }
+            .toolbar {
+                ToolbarItemGroup(placement: .keyboard) {
+                    Button("Done") {
+                        hideKeyboard()
+                    }
+                }
+            }
         }.navigationTitle($workout.name)
         .navigationBarTitleDisplayMode(.inline)
+        
     }
     
     init(workout: WorkoutModel, number: Int) {
