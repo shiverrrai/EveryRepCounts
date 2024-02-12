@@ -17,6 +17,7 @@
 		C89B01F22B05F1FB0087A219 /* SetModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89B01F12B05F1FB0087A219 /* SetModel.swift */; };
 		C89B01F42B05F3940087A219 /* ExerciseModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89B01F32B05F3940087A219 /* ExerciseModel.swift */; };
 		C89B01F62B05F4AA0087A219 /* WorkoutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C89B01F52B05F4AA0087A219 /* WorkoutModel.swift */; };
+		C8A953082B799EE40095BEF1 /* ExerciseDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8A953072B799EE40095BEF1 /* ExerciseDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,6 +32,7 @@
 		C89B01F12B05F1FB0087A219 /* SetModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetModel.swift; sourceTree = "<group>"; };
 		C89B01F32B05F3940087A219 /* ExerciseModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseModel.swift; sourceTree = "<group>"; };
 		C89B01F52B05F4AA0087A219 /* WorkoutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutModel.swift; sourceTree = "<group>"; };
+		C8A953072B799EE40095BEF1 /* ExerciseDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseDetailView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +99,7 @@
 				C86ABA822B096AEA00316A36 /* AddWorkoutView.swift */,
 				C86ABA842B09865400316A36 /* AddExerciseView.swift */,
 				C83AE1DD2B42407E0085E52A /* TestView.swift */,
+				C8A953072B799EE40095BEF1 /* ExerciseDetailView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -172,6 +175,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C89B01F62B05F4AA0087A219 /* WorkoutModel.swift in Sources */,
+				C8A953082B799EE40095BEF1 /* ExerciseDetailView.swift in Sources */,
 				C80A393A2AAF66800049CFFC /* ContentView.swift in Sources */,
 				C86ABA852B09865400316A36 /* AddExerciseView.swift in Sources */,
 				C86ABA832B096AEA00316A36 /* AddWorkoutView.swift in Sources */,
