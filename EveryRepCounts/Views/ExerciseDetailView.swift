@@ -8,13 +8,11 @@
 import SwiftUI
 
 struct ExerciseDetailView: View {
+    var exerciseName: String
+    
     var body: some View {
         // Implement your detailed exercise view here
-        Text("Detailed Exercise View")
+        Text(exerciseName).font(.title)
             .padding()
     }
-}
-
-#Preview {
-    ExerciseDetailView()
 }

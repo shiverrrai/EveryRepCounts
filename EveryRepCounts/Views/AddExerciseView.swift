@@ -28,7 +28,7 @@ struct ExerciseRow: View {
         HStack {
             Text(exerciseName)
             Spacer()
-            NavigationLink(destination: ExerciseDetailView()) {}
+            NavigationLink(destination: ExerciseDetailView(exerciseName: exerciseName)) {}
             Button("Add Exercise", systemImage: "plus.square.fill") {
                 addExercise(exerciseName: exerciseName)
             }
@@ -55,7 +55,7 @@ struct AddExerciseView: View {
     @Environment(\.modelContext) var modelContext
     @Bindable var workout: WorkoutModel
     @State private var searchText = ""
-    let exerciseList = ["Bench Press", "Lat Pulldown", "Lateral Raises", "Squat"]
+    @Query(sort: [SortDescriptor(\ExerciseDetailModel.number)]) var exercises: [ExerciseDetailModel]
     
     var body: some View {
         List {
@@ -65,18 +65,18 @@ struct AddExerciseView: View {
             }
             Section(header: Text("Exercises")) {
                 ForEach(searchResults, id: \.self) { exercise in
-                    ExerciseRow(workout: workout, exerciseName: exercise)
+                    ExerciseRow(workout: workout, exerciseName: exercise.name)
                 }
             }
             
         }
     }
     
-    var searchResults: [String] {
+    var searchResults: [ExerciseDetailModel] {
         if searchText.isEmpty {
-            return exerciseList
+            return exercises
         } else {
-            return exerciseList.filter { $0.contains(searchText) }
+            return exercises.filter { $0.name.contains(searchText) }
         }
     }
 }

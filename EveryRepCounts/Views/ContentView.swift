@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.modelContext) var modelContext
     @Query(sort: [SortDescriptor(\WorkoutModel.number)]) var workouts: [WorkoutModel]
     @Query(sort: [SortDescriptor(\ExerciseModel.number)]) var exercises: [ExerciseModel]
+    @Query(sort: [SortDescriptor(\ExerciseDetailModel.name)]) var exerciseDetails: [ExerciseDetailModel]
     @State private var path = [WorkoutModel]()
     
     var body: some View {
@@ -56,10 +57,17 @@ struct ContentView: View {
                 print("\(exercise.name) \(exercise.number)")
             }
         }
-        print("~~~exercises")
+        print("Exercises")
         for exercise in exercises {
             print("\(exercise.name) \(exercise.number)")
         }
+        print("ExerciseDetails")
+        for exerciseDetail in exerciseDetails {
+            if let unwrappedDetails = exerciseDetail.details {
+                print("\(exerciseDetail.name) \(exerciseDetail.number): \(unwrappedDetails)")
+            }
+        }
+        
     }
     
     
