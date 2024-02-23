@@ -3,5 +3,10 @@
         "name": "Bench Press",
         "number": 0,
         "details": "yooooo waddup homie g"
+    },
+    {
+        "name": "Lat Pulldown",
+        "number": 1,
+        "details": "i got big lats like michael phelps"
     }
 ]
